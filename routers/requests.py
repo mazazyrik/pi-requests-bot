@@ -24,10 +24,10 @@ async def cmd_start(message: Message):
             text='Перейти в канал',
             url=CHANNEL_URL
         ),
-        InlineKeyboardButton(
-            text='Связаться с админом',
-            callback_data='contact'
-        )
+        # InlineKeyboardButton(
+        #     text='Связаться с админом',
+        #     callback_data='contact'
+        # ) оставляем на потом по надобности
     )
 
     await message.answer(
