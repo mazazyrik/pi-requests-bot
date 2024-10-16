@@ -16,7 +16,7 @@ import urllib3
 
 
 async def main() -> None:
-    bot = Bot(config.bot_token.get_secret_value(), parse_mode="HTML")
+    bot = Bot(config.bot_token.get_secret_value())
     dp = Dispatcher()
     
 
