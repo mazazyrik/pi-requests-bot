@@ -1,27 +1,37 @@
 import asyncio
-import logging
-
 from aiogram import Bot, Dispatcher
 
-from routers import requests
+import handlers
 
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s',
-    datefmt='%Y-%m-%d %H:%M:%S'
-)
+import handlers.admin_message
+import handlers.bot_message
+from middlewares.check_sub import CheckSubscription
+from middlewares.antiflood import AntiFloodMiddleware
+
+from config_reader import config
+
+import urllib3
+
+# urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 
-bot = Bot(token="7452638953:AAE_pQRLxNXBfYqY8SDGq2TeysXE_xTkgCE")
-
-
-async def main():
+async def main() -> None:
+    bot = Bot(config.bot_token.get_secret_value(), parse_mode="HTML")
     dp = Dispatcher()
-    dp.include_routers(requests.router)
+    
 
-    await bot.delete_webhook(drop_pending_updates=True)
-    await dp.start_polling(bot, skip_updates=False)
+    # dp.message.middleware(AntiFloodMiddleware(0.2))
+    dp.message.middleware(CheckSubscription())
 
+
+    dp.include_routers(
+        handlers.start_message.router,
+        handlers.admin_message.router,
+        handlers.bot_message.router
+    )
+
+    await bot.delete_webhook(drop_pending_updates=False)
+    await dp.start_polling(bot)
 
 if __name__ == "__main__":
     asyncio.run(main())
